@@ -25,12 +25,32 @@
       font-size: 14px;
       line-height: 1.6;
     }
+    button {
+      background: #34a853;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      width: 100%;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #2d8e47;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
   <h1>Seek Jobs Saver</h1>
   
   <div id="jobTitle">Loading...</div>
+  
+  <button id="downloadJob">Download as JSON</button>
 
   <script src="popup.js"></script>
 </body>

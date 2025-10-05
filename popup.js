@@ -1,3 +1,5 @@
+let currentJob = null;
+
 // Run automatically when popup opens
 (async () => {
   // Get the current active tab
@@ -11,25 +13,63 @@
   
   // Display the result
   const jobData = results[0].result;
+  currentJob = jobData;
+  
   const output = document.getElementById('jobTitle');
+  const downloadBtn = document.getElementById('downloadJob');
   
   if (jobData.title) {
+    // Get first 10 words of description
+    const descPreview = jobData.description 
+      ? jobData.description.split(' ').slice(0, 10).join(' ') + '...'
+      : 'Not found';
+    
     output.innerHTML = `
       <strong>Job ID:</strong> ${jobData.id || 'Not found'}<br>
       <strong>Title:</strong> ${jobData.title}<br>
       <strong>Location:</strong> ${jobData.location || 'Not found'}<br>
-      <strong>Salary:</strong> ${jobData.salary || 'Not listed'}
+      <strong>Salary:</strong> ${jobData.salary || 'Not listed'}<br>
+      <strong>Description:</strong> ${descPreview}
     `;
   } else {
     output.textContent = 'Not on a Seek job page';
+    downloadBtn.disabled = true;
   }
 })();
+
+// Download button handler
+document.getElementById('downloadJob').addEventListener('click', () => {
+  if (!currentJob) return;
+  
+  // Add timestamp
+  const jobWithTimestamp = {
+    ...currentJob,
+    savedAt: new Date().toISOString()
+  };
+  
+  // Create JSON string
+  const jsonStr = JSON.stringify(jobWithTimestamp, null, 2);
+  
+  // Create blob and download
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  // Create temporary link and click it
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `seek-job-${currentJob.id || 'unknown'}.json`;
+  a.click();
+  
+  // Cleanup
+  URL.revokeObjectURL(url);
+});
 
 // This function runs on the Seek page itself
 function extractJobData() {
   const titleElement = document.querySelector('[data-automation="job-detail-title"]');
   const locationElement = document.querySelector('[data-automation="job-detail-location"]');
   const salaryElement = document.querySelector('[data-automation="job-detail-salary"]');
+  const descriptionElement = document.querySelector('[data-automation="jobAdDetails"]');
   
   // Extract job ID from URL query parameter
   const urlParams = new URLSearchParams(window.location.search);
@@ -42,10 +82,17 @@ function extractJobData() {
     title = link ? link.textContent.trim() : titleElement.textContent.trim();
   }
   
+  // Get description text (full text for JSON export)
+  let description = null;
+  if (descriptionElement) {
+    description = descriptionElement.textContent.trim();
+  }
+  
   return {
     id: jobId,
     title: title,
     location: locationElement ? locationElement.textContent.trim() : null,
-    salary: salaryElement ? salaryElement.textContent.trim() : null
+    salary: salaryElement ? salaryElement.textContent.trim() : null,
+    description: description
   };
 }
