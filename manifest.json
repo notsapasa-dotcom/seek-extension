@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Seek Jobs Saver",
+  "version": "1.0",
+  "description": "Save and track Seek job postings",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.seek.com.au/*"
+  ]
+}
