@@ -17,7 +17,7 @@
       color: #333;
       margin-bottom: 15px;
     }
-    #jobTitle {
+    #jobTitle, #linkedinJobTitle, #indeedJobTitle {
       margin-top: 15px;
       padding: 10px;
       background: #f0f0f0;
@@ -54,11 +54,22 @@
   </style>
 </head>
 <body>
-  <h1>Seek Jobs Saver</h1>
+  <h1>Jobs Saver</h1>
   
-  <div id="jobTitle">Loading...</div>
-  
-  <button id="downloadJob">Download as JSON</button>
+  <div id="seekForm">
+    <div id="jobTitle">Loading...</div>
+    <button id="downloadJob">Download as SEEK JSON</button>
+  </div>
+
+  <div id="linkedinForm" style="display:none;">
+    <div id="linkedinJobTitle">LinkedIn job info will appear here.</div>
+    <button id="downloadLinkedinJob">Download LinkedIn JSON</button>
+  </div>
+
+  <div id="indeedForm" style="display:none;">
+    <div id="indeedJobTitle">Indeed job info will appear here.</div>
+    <button id="downloadIndeedJob">Download Indeed JSON</button>
+  </div>
 
   <script src="popup.js"></script>
 </body>
