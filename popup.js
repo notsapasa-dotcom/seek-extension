@@ -70,16 +70,37 @@ function extractJobData() {
   const locationElement = document.querySelector('[data-automation="job-detail-location"]');
   const salaryElement = document.querySelector('[data-automation="job-detail-salary"]');
   const descriptionElement = document.querySelector('[data-automation="jobAdDetails"]');
-  
-  // Extract job ID from URL query parameter
+  const advertiserElement = document.querySelector('[data-automation="advertiser-name"]');
+  // Extract job ID from URL - check both formats
   const urlParams = new URLSearchParams(window.location.search);
-  const jobId = urlParams.get('jobId');
+  let jobId = urlParams.get('jobId'); // Format 1: ?jobId=87447074
   
-  // Get title text
+  // If not found in query params, check path format
+  if (!jobId) {
+    const pathMatch = window.location.pathname.match(/\/job\/(\d+)/); // Format 2: /job/87447074
+    if (pathMatch) {
+      jobId = pathMatch[1];
+    }
+  }
+  
+  // Get current page URL
+  const currentUrl = window.location.href;
+  
+  // Get title text and job URL
   let title = null;
+  let jobUrl = null;
   if (titleElement) {
     const link = titleElement.querySelector('a');
-    title = link ? link.textContent.trim() : titleElement.textContent.trim();
+    if (link) {
+      title = link.textContent.trim();
+      // Get the href and convert to full URL if it's relative
+      const href = link.getAttribute('href');
+      if (href) {
+        jobUrl = href.startsWith('http') ? href : `https://www.seek.com.au${href}`;
+      }
+    } else {
+      title = titleElement.textContent.trim();
+    }
   }
   
   // Get description text (full text for JSON export)
@@ -88,11 +109,20 @@ function extractJobData() {
     description = descriptionElement.textContent.trim();
   }
   
+  // Get advertiser name
+  let advertiser = null;
+  if (advertiserElement) {
+    advertiser = advertiserElement.textContent.trim();
+  }
+  
   return {
     id: jobId,
     title: title,
     location: locationElement ? locationElement.textContent.trim() : null,
     salary: salaryElement ? salaryElement.textContent.trim() : null,
-    description: description
+    description: description,
+    advertiser: advertiser,
+    jobUrl: jobUrl,
+    searchUrl: currentUrl
   };
 }
